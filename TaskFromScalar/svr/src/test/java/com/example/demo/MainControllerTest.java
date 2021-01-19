@@ -3,6 +3,7 @@ package com.example.demo;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
+import com.example.demo.model.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -33,7 +34,7 @@ public class MainControllerTest {
 
     @Test
     public void test_get() throws Exception {
-        UserModel mdl = getUser11();
+        User mdl = getUser11();
 
         this.mockMvc.perform(
                 post("/user")
@@ -90,7 +91,7 @@ public class MainControllerTest {
 
     @Test
     public void test_err() throws Exception {
-        UserModel mdl = getUser12();
+        User mdl = getUser12();
 
         this.mockMvc.perform(
                 put("/user/{username}",mdl.getUsername())
@@ -134,8 +135,8 @@ public class MainControllerTest {
 
     }
 
-    public UserModel getUser11() {
-        UserModel mdl = new UserModel();
+    public User getUser11() {
+        User mdl = new User();
         mdl.setId("11");
         mdl.setUsername("pppp1ssss1");
         mdl.setFirstname("pppp1");
@@ -147,8 +148,8 @@ public class MainControllerTest {
         return mdl;
     }
 
-    public UserModel getUser12() {
-        UserModel mdl = new UserModel();
+    public User getUser12() {
+        User mdl = new User();
         mdl.setId("12");
         mdl.setUsername("pppp2ssss2");
         mdl.setFirstname("pppp2");
