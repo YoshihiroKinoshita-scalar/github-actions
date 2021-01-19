@@ -1,0 +1,12 @@
+version: '3.5'
+
+services:
+  svr:
+    build: ./Docker
+    ports:
+      - 8080:8080
+    tty: true
+    volumes:
+      - ./svr:/svr
+      - ./smp:/smp
+    working_dir: /svr
