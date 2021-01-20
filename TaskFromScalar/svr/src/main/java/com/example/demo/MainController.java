@@ -1,5 +1,6 @@
 package com.example.demo;
 
+import com.example.demo.model.User;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -22,7 +23,7 @@ public class MainController {
 
   @PostMapping() // Map ONLY POST Requests
   //@ResponseStatus(HttpStatus.CREATED)
-  public ResponseEntity<UserModel> addNewUser (
+  public ResponseEntity<User> addNewUser (
           @RequestParam String id,
           @RequestParam String username,
           @RequestParam String firstname,
@@ -33,7 +34,7 @@ public class MainController {
     // @ResponseBody means the returned String is the response, not a view name
     // @RequestParam means it is a parameter from the GET or POST request
 
-    UserModel user = new UserModel();
+    User user = new User();
     user.setId(id);
 
     user.setUsername(username);
@@ -60,7 +61,7 @@ public class MainController {
   }
 
   @PutMapping(path="{username}")
-  public ResponseEntity<UserModel> updateUser (
+  public ResponseEntity<User> updateUser (
           @PathVariable String username,
           @RequestParam String id,
           @RequestParam String firstname,
@@ -69,7 +70,7 @@ public class MainController {
           @RequestParam String password,
           @RequestParam String phone) {
 
-    UserModel user = new UserModel();
+    User user = new User();
     user.setId(id);
     user.setUsername(username);
     user.setFirstname(firstname);
@@ -99,7 +100,7 @@ public class MainController {
   public ResponseEntity<String>  deleteUser (
           @PathVariable String username ) {
 
-    UserModel user = new UserModel();
+    User user = new User();
 
     user.setUsername(username);
 
@@ -119,12 +120,12 @@ public class MainController {
   }
 
   @GetMapping(path="{username}")
-  public ResponseEntity<UserModel> readUser (
+  public ResponseEntity<User> readUser (
           @PathVariable String username ) {
 
     try {
       UserService obj = new UserService();
-      UserModel ret = obj.get(username);
+      User ret = obj.get(username);
       obj.close();
       if ( ret != null ) {
         return new ResponseEntity<>(ret,HttpStatus.OK);
@@ -138,12 +139,12 @@ public class MainController {
   }
 
   @GetMapping(path="/list")
-  public ResponseEntity<Iterable<UserModel>> getAllUsers() {
+  public ResponseEntity<Iterable<User>> getAllUsers() {
     // This returns a JSON or XML with the users
 
     try {
       UserService obj = new UserService();
-      ArrayList<UserModel> lst = obj.list();
+      ArrayList<User> lst = obj.list();
       obj.close();
       if ( lst.size() > 0 ) {
         return new ResponseEntity<>(lst,HttpStatus.OK);

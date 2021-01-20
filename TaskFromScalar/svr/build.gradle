@@ -1,5 +1,5 @@
 plugins {
-	id 'org.springframework.boot' version '2.2.12.BUILD-SNAPSHOT'
+	id 'org.springframework.boot' version '2.2.1.BUILD-SNAPSHOT'
 	id 'io.spring.dependency-management' version '1.0.10.RELEASE'
 	id 'java'
 }
@@ -33,9 +33,6 @@ dependencies {
     compile group: 'com.datastax.cassandra', name: 'cassandra-driver-core', version: '3.6.0'
     compile group: 'com.google.inject', name: 'guice', version: '4.2.0'
 	compile files('./libs/scalardb-1.1.0.jar')
-	//{
-    //	exclude group: 'org.slf4j'
-    //}
 	annotationProcessor 'org.projectlombok:lombok'
 	testImplementation('org.springframework.boot:spring-boot-starter-test') {
 		exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'

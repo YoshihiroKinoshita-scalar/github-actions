@@ -1,5 +1,6 @@
 package com.example.demo;
 
+import com.example.demo.model.User;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.scalar.database.config.DatabaseConfig;
@@ -57,7 +58,7 @@ public class UserService {
     transactionService.with(NAMESPACE, TABLE_NAME);
   }
 
-  public boolean create(UserModel user) throws CrudException, CommitException, UnknownTransactionStatusException {
+  public boolean create(User user) throws CrudException, CommitException, UnknownTransactionStatusException {
     DistributedTransaction tx = transactionService.start();
     Key partitionKey = new Key(new TextValue(GROUP_ID, GROUP_IDV));
     Key clusteringKey = new Key(new TextValue(USERNAME, user.getUsername()));
@@ -79,7 +80,7 @@ public class UserService {
     return true;
   }
 
-  public boolean update(UserModel user) throws CrudException, CommitException, UnknownTransactionStatusException {
+  public boolean update(User user) throws CrudException, CommitException, UnknownTransactionStatusException {
     DistributedTransaction tx = transactionService.start();
     Key partitionKey = new Key(new TextValue(GROUP_ID, GROUP_IDV));
     Key clusteringKey = new Key(new TextValue(USERNAME, user.getUsername()));
@@ -101,7 +102,7 @@ public class UserService {
     return true;
   }
 
-  public boolean delete(UserModel user) throws CrudException, CommitException, UnknownTransactionStatusException {
+  public boolean delete(User user) throws CrudException, CommitException, UnknownTransactionStatusException {
     DistributedTransaction tx = transactionService.start();
     Key partitionKey = new Key(new TextValue(GROUP_ID, GROUP_IDV));
     Key clusteringKey = new Key(new TextValue(USERNAME, user.getUsername()));
@@ -116,13 +117,13 @@ public class UserService {
     return true;
   }
 
-  public ArrayList<UserModel> list() throws ExecutionException {
-    ArrayList<UserModel> ret = new ArrayList<UserModel>();
+  public ArrayList<User> list() throws ExecutionException {
+    ArrayList<User> ret = new ArrayList<User>();
     Key partitionKey = new Key(new TextValue(GROUP_ID, GROUP_IDV));
     Scan scan = new Scan(partitionKey);
     Scanner scanner = storageService.scan(scan);
     scanner.forEach(r -> {
-      UserModel user = new UserModel();
+      User user = new User();
       r.getValue(ID).ifPresent(v -> user.setId(((TextValue) v).getString().get()));
       r.getValue(USERNAME).ifPresent(v -> user.setUsername(((TextValue) v).getString().get()));
       r.getValue(FIRSTNAME).ifPresent(v -> user.setFirstname(((TextValue) v).getString().get()));
@@ -136,7 +137,7 @@ public class UserService {
     return ret;
   }
 
-  public UserModel get(String username) throws ExecutionException {
+  public User get(String username) throws ExecutionException {
     Key partitionKey = new Key(new TextValue(GROUP_ID, GROUP_IDV));
     Key clusteringKey = new Key(new TextValue(USERNAME, username));
     Get get = new Get(partitionKey, clusteringKey);
@@ -145,7 +146,7 @@ public class UserService {
       return null;
     }
     Result r = res.get();
-    UserModel user = new UserModel();
+    User user = new User();
     user.setId( ((TextValue)r.getValue(ID).get()).getString().get());
     user.setUsername( ((TextValue)r.getValue(USERNAME).get()).getString().get());
     user.setFirstname(((TextValue)r.getValue(FIRSTNAME).get()).getString().get());
