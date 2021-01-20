@@ -47,4 +47,4 @@ ENV SCHEMATOOL /root/scalardb/tools/schema
 
 #SHELL ["/bin/sh", "-c"]
 
-WORKDIR /svr
+WORKDIR /server
