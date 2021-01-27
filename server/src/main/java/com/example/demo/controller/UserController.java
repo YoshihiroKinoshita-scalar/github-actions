@@ -1,6 +1,9 @@
-package com.example.demo;
+package com.example.demo.controller;
 
 import com.example.demo.model.User;
+import com.example.demo.service.UserService;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,13 +19,15 @@ import java.util.ArrayList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@RestController // This means that this class is a Controller
-@RequestMapping(path="/user") // This means URL's start with /demo (after Application path)
-public class MainController {
-  private static final Logger LOG = LoggerFactory.getLogger(MainController.class);
+@RestController
+@RequestMapping("/user")
+public class UserController {
+  private static final Logger LOG = LoggerFactory.getLogger(UserController.class);
 
-  @PostMapping() // Map ONLY POST Requests
-  //@ResponseStatus(HttpStatus.CREATED)
+  @Autowired
+  private UserService userService;
+
+  @PostMapping() 
   public ResponseEntity<User> addNewUser (
           @RequestParam String id,
           @RequestParam String username,
@@ -31,8 +36,6 @@ public class MainController {
           @RequestParam String email,
           @RequestParam String password,
           @RequestParam String phone) {
-    // @ResponseBody means the returned String is the response, not a view name
-    // @RequestParam means it is a parameter from the GET or POST request
 
     User user = new User();
     user.setId(id);
@@ -46,10 +49,8 @@ public class MainController {
     user.setUserstatus(0);
 
     try {
-      UserService obj = new UserService();
-      boolean ret = obj.create(user);
-      obj.close();
-      if ( ret == true ) {
+      boolean canCreate = userService.create(user);
+      if ( canCreate == true ) {
         return new ResponseEntity<>(user,HttpStatus.CREATED);
       } else {
         return new ResponseEntity<>(null,HttpStatus.BAD_REQUEST);
@@ -60,7 +61,7 @@ public class MainController {
     }
   }
 
-  @PutMapping(path="{username}")
+  @PutMapping("{username}")
   public ResponseEntity<User> updateUser (
           @PathVariable String username,
           @RequestParam String id,
@@ -81,10 +82,8 @@ public class MainController {
     user.setUserstatus(0);
 
     try {
-      UserService obj = new UserService();
-      boolean ret = obj.update(user);
-      obj.close();
-      if ( ret == true ) {
+      boolean canUpdate = userService.update(user);
+      if ( canUpdate == true ) {
         return new ResponseEntity<>(user,HttpStatus.OK);
       } else {
         return new ResponseEntity<>(null,HttpStatus.NOT_FOUND);
@@ -95,8 +94,7 @@ public class MainController {
     }
   }
 
-  @DeleteMapping(path="{username}")
-  //@ResponseStatus(HttpStatus.NO_CONTENT)
+  @DeleteMapping("{username}")
   public ResponseEntity<String>  deleteUser (
           @PathVariable String username ) {
 
@@ -105,10 +103,8 @@ public class MainController {
     user.setUsername(username);
 
     try {
-      UserService obj = new UserService();
-      boolean ret = obj.delete(user);
-      obj.close();
-      if ( ret == true ) {
+      boolean canDelete = userService.delete(user);
+      if ( canDelete == true ) {
         return new ResponseEntity<>("",HttpStatus.OK);
       } else {
         return new ResponseEntity<>(null,HttpStatus.NOT_FOUND);
@@ -119,18 +115,16 @@ public class MainController {
     }
   }
 
-  @GetMapping(path="{username}")
+  @GetMapping("{username}")
   public ResponseEntity<User> readUser (
           @PathVariable String username ) {
 
     try {
-      UserService obj = new UserService();
-      User ret = obj.get(username);
-      obj.close();
-      if ( ret != null ) {
-        return new ResponseEntity<>(ret,HttpStatus.OK);
+      User userInfo = userService.get(username);
+      if ( userInfo != null ) {
+        return new ResponseEntity<>(userInfo,HttpStatus.OK);
       } else {
-        return new ResponseEntity<>(ret,HttpStatus.NOT_FOUND);
+        return new ResponseEntity<>(userInfo,HttpStatus.NOT_FOUND);
       }
     } catch( Exception ex) {
       LOG.warn("handleException",ex);
@@ -138,18 +132,15 @@ public class MainController {
     }
   }
 
-  @GetMapping(path="/list")
+  @GetMapping("/list")
   public ResponseEntity<Iterable<User>> getAllUsers() {
-    // This returns a JSON or XML with the users
 
     try {
-      UserService obj = new UserService();
-      ArrayList<User> lst = obj.list();
-      obj.close();
-      if ( lst.size() > 0 ) {
-        return new ResponseEntity<>(lst,HttpStatus.OK);
+      ArrayList<User> userList = userService.list();
+      if ( userList.size() > 0 ) {
+        return new ResponseEntity<>(userList,HttpStatus.OK);
       } else {
-        return new ResponseEntity<>(lst,HttpStatus.NOT_FOUND);
+        return new ResponseEntity<>(userList,HttpStatus.NOT_FOUND);
       }
     } catch( Exception ex) {
       return null;

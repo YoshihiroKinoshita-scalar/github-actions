@@ -24,8 +24,8 @@ gradle-app.setting
 # Gradle
 .idea/**/gradle.xml
 .idea/**/libraries
-.idea/modules.xml
-.idea/*iml
+.idea/*.xml
+.idea/*.iml
 
 # IntelliJ
 out/

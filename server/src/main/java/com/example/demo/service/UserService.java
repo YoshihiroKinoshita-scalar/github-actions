@@ -1,4 +1,4 @@
-package com.example.demo;
+package com.example.demo.service;
 
 import com.example.demo.model.User;
 import com.google.inject.Guice;
@@ -8,6 +8,8 @@ import com.scalar.database.service.StorageModule;
 import com.scalar.database.service.StorageService;
 import com.scalar.database.service.TransactionModule;
 import com.scalar.database.service.TransactionService;
+
+import org.springframework.stereotype.Service;
 
 import java.io.File;
 import java.io.IOException;
@@ -31,6 +33,7 @@ import com.scalar.database.api.Scanner;
 
 import java.util.ArrayList;
 
+@Service
 public class UserService {
   private final String NAMESPACE = "demo";
   private final String TABLE_NAME = "user";
