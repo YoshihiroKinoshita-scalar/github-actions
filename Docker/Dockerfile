@@ -17,15 +17,6 @@ RUN mkdir -p /data/cassandra/hints
 RUN mkdir -p /data/cassandra/saved_caches
 RUN chown -R cassandra:cassandra /data/cassandra
 
-# Golang
-RUN curl -L https://dl.google.com/go/go1.10.5.linux-amd64.tar.gz > go1.10.5.linux-amd64.tar.gz
-RUN tar -C /usr/local -xzf go1.10.5.linux-amd64.tar.gz
-
-SHELL ["/bin/bash", "-c"]
-RUN curl -s "https://get.sdkman.io" | bash
-RUN source /root/.sdkman/bin/sdkman-init.sh; sdk install gradle 4.10.2
-ENV PATH $PATH:/usr/local/go/bin
-
 # Env File
 RUN mkdir /etc/scalar
 COPY database.properties /etc/scalar/
@@ -37,13 +28,12 @@ WORKDIR /root
 RUN git clone https://github.com/scalar-labs/scalardb.git
 ENV SCALARDB_HOME /root/scalardb
 WORKDIR /root/scalardb
-RUN git checkout 1.1.0
 RUN ./gradlew installDist
-WORKDIR /root/scalardb/tools/schema
-RUN ls
-RUN make
-
-ENV SCHEMATOOL /root/scalardb/tools/schema
+RUN mkdir /var/log/scalar
+RUN chmod 777 /var/log/scalar
+WORKDIR /root/scalardb/docs/getting-started
+RUN curl -L https://github.com/scalar-labs/scalardb/releases/download/v2.4.1/scalar-schema-standalone-2.4.1.jar > scalar-schema-standalone-2.4.1.jar
+ENV SCHEMATOOL /root/scalardb/docs/getting-started
 
 #SHELL ["/bin/sh", "-c"]
 

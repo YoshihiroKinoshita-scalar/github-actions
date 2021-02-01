@@ -1,0 +1,22 @@
+{
+  "demo.user": {
+    "transaction": true,
+    "partition-key": [
+      "group_id"
+    ],
+    "clustering-key": [
+      "username"
+    ],
+    "columns": {
+      "group_id": "TEXT",
+      "username": "TEXT",
+      "id": "TEXT",
+      "firstname": "TEXT",
+      "lastname": "TEXT",
+      "email": "TEXT",
+      "password": "TEXT",
+      "phone": "TEXT",
+      "userstatus": "INT"
+    }
+  }
+}
