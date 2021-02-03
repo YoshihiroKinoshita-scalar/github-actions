@@ -1,143 +1,167 @@
 package com.example.demo;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doReturn;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-import com.example.demo.controller.UserController;
 import com.example.demo.model.User;
-import org.junit.jupiter.api.BeforeEach;
+import com.example.demo.service.UserService;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import org.assertj.core.util.Lists;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.runner.RunWith;
-import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.web.bind.annotation.RestController;
 
-import lombok.RequiredArgsConstructor;
-
-@RestController
-@RequiredArgsConstructor
-@RunWith(SpringRunner.class)
 @SpringBootTest
+@AutoConfigureMockMvc
 public class UserControllerTest {
-    MockMvc mockMvc;
 
     @Autowired
-    private UserController userController;
+    private MockMvc mockMvc;
 
-    @BeforeEach
-    public void initmocks() {
-        MockitoAnnotations.initMocks(this);
-        mockMvc = MockMvcBuilders.standaloneSetup(userController).build();
+    @MockBean
+    private UserService userService;
+
+    @Test
+    @DisplayName("POST /user - isCreated")
+    public void testCreateUser() throws Exception {
+        User user = getUser();
+        doReturn(true).when(userService).create(any());
+
+        mockMvc.perform(post("/user")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(asJsonString(user)))
+            .andExpect(status().isCreated())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andExpect(jsonPath("$.id").value(user.getId()))
+            .andExpect(jsonPath("$.username").value(user.getUsername()))
+            .andExpect(jsonPath("$.firstname").value(user.getFirstname()))
+            .andExpect(jsonPath("$.lastname").value(user.getLastname()))
+            .andExpect(jsonPath("$.email").value(user.getEmail()))
+            .andExpect(jsonPath("$.password").value(user.getPassword()))
+            .andExpect(jsonPath("$.userstatus").value(user.getUserstatus()));    
     }
 
     @Test
-    public void test_get() throws Exception {
-        User mdl = getUser11();
+    @DisplayName("POST /user - badRequest")
+    public void testCreateUserBadRequest() throws Exception {
+        User user = new User();
+        doReturn(false).when(userService).create(user);
 
-        this.mockMvc.perform(
-                post("/user")
-                        .param("id",mdl.getId())
-                        .param("username",mdl.getUsername())
-                        .param("firstname",mdl.getFirstname())
-                        .param("lastname",mdl.getLastname())
-                        .param("email",mdl.getEmail())
-                        .param("password",mdl.getPassword())
-                        .param("phone",mdl.getPhone()))
-                .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.username").value(mdl.getUsername()));
-
-        this.mockMvc.perform(get("/user/{username}",mdl.getUsername()))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(mdl.getId()))
-                .andExpect(jsonPath("$.username").value(mdl.getUsername()))
-                .andExpect(jsonPath("$.firstname").value(mdl.getFirstname()))
-                .andExpect(jsonPath("$.lastname").value(mdl.getLastname()))
-                .andExpect(jsonPath("$.email").value(mdl.getEmail()))
-                .andExpect(jsonPath("$.password").value(mdl.getPassword()))
-                .andExpect(jsonPath("$.phone").value(mdl.getPhone()));
-
-        mdl.setId("0");
-        mdl.setFirstname("pppp");
-        mdl.setLastname("ssss");
-        mdl.setEmail("usr1@example.com");
-        mdl.setPassword("password");
-        mdl.setPhone("000-0000-0000");
-        this.mockMvc.perform(
-                put("/user/{username}",mdl.getUsername())
-                        .param("id",mdl.getId())
-                        .param("firstname",mdl.getFirstname())
-                        .param("lastname",mdl.getLastname())
-                        .param("email",mdl.getEmail())
-                        .param("password",mdl.getPassword())
-                        .param("phone",mdl.getPhone()))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.username").value(mdl.getUsername()));
-
-        this.mockMvc.perform(get("/user/{username}",mdl.getUsername()))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(mdl.getId()))
-                .andExpect(jsonPath("$.username").value(mdl.getUsername()))
-                .andExpect(jsonPath("$.firstname").value(mdl.getFirstname()))
-                .andExpect(jsonPath("$.lastname").value(mdl.getLastname()))
-                .andExpect(jsonPath("$.email").value(mdl.getEmail()))
-                .andExpect(jsonPath("$.password").value(mdl.getPassword()))
-                .andExpect(jsonPath("$.phone").value(mdl.getPhone()));
-
-        this.mockMvc.perform(delete("/user/{username}",mdl.getUsername()))
-                .andExpect(status().isOk());
+        mockMvc.perform(post("/user")
+            .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isBadRequest());
     }
 
     @Test
-    public void test_err() throws Exception {
-        User mdl = getUser12();
+    @DisplayName("GET /user/{username} - isOK")
+    public void testGetUser() throws Exception {
+        User user = getUser();
+        doReturn(user).when(userService).get(user.getUsername());
 
-        this.mockMvc.perform(
-                put("/user/{username}",mdl.getUsername())
-                        .param("id",mdl.getId())
-                        .param("firstname",mdl.getFirstname())
-                        .param("lastname",mdl.getLastname())
-                        .param("email",mdl.getEmail())
-                        .param("password",mdl.getPassword())
-                        .param("phone",mdl.getPhone())     )
-                .andExpect(status().isNotFound());
-
-        this.mockMvc.perform(
-                delete("/user/{username}",mdl.getUsername()))
-                .andExpect(status().isNotFound());
-
-        this.mockMvc.perform(get("/user/{username}",mdl.getUsername()))
-                .andExpect(status().isNotFound());
-
-        this.mockMvc.perform(
-                post("/user")
-                        .param("id",mdl.getId())
-                        .param("username",mdl.getUsername())
-                        .param("firstname",mdl.getFirstname())
-                        .param("lastname",mdl.getLastname())
-                        .param("email",mdl.getEmail())
-                        .param("password",mdl.getPassword())
-                        .param("phone",mdl.getPhone()))
-                .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.username").value(mdl.getUsername()));
-
-        this.mockMvc.perform(
-                post("/user")
-                        .param("id",mdl.getId())
-                        .param("username",mdl.getUsername())
-                        .param("firstname",mdl.getFirstname())
-                        .param("lastname",mdl.getLastname())
-                        .param("email",mdl.getEmail())
-                        .param("password",mdl.getPassword())
-                        .param("phone",mdl.getPhone()))
-                .andExpect(status().isBadRequest());
-
+        mockMvc.perform(get("/user/{username}", user.getUsername()))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andExpect(jsonPath("$.id").value(user.getId()))
+            .andExpect(jsonPath("$.username").value(user.getUsername()))
+            .andExpect(jsonPath("$.firstname").value(user.getFirstname()))
+            .andExpect(jsonPath("$.lastname").value(user.getLastname()))
+            .andExpect(jsonPath("$.email").value(user.getEmail()))
+            .andExpect(jsonPath("$.password").value(user.getPassword()))
+            .andExpect(jsonPath("$.userstatus").value(user.getUserstatus()));
     }
 
-    public User getUser11() {
+    @Test
+    @DisplayName("GET /user/{username} - notFound")
+    public void testGetUserNotFound() throws Exception {
+        User user = getUser();
+        doReturn(null).when(userService).get(user.getUsername());
+
+        mockMvc.perform(get("/user/{username}", user.getUsername()))
+            .andExpect(status().isNotFound());
+    }
+
+    @Test
+    @DisplayName("PUT /user/{username} - isOK") 
+    public void testPutUser() throws Exception {
+        User user = getUser();
+        user.setEmail("test2@example.com");
+        doReturn(true).when(userService).update(any());
+
+        mockMvc.perform(put("/user/{username}", user.getUsername())
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(asJsonString(user)))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andExpect(jsonPath("$.id").value(user.getId()))
+            .andExpect(jsonPath("$.username").value(user.getUsername()))
+            .andExpect(jsonPath("$.firstname").value(user.getFirstname()))
+            .andExpect(jsonPath("$.lastname").value(user.getLastname()))
+            .andExpect(jsonPath("$.email").value("test2@example.com"))
+            .andExpect(jsonPath("$.password").value(user.getPassword()))
+            .andExpect(jsonPath("$.userstatus").value(user.getUserstatus()));
+    }
+
+    @Test
+    @DisplayName("PUT /user/{username} - notFound")
+    public void testPutUserNotFound() throws Exception {
+        User user = getUser();
+        doReturn(null).when(userService).get(user.getUsername());
+
+        mockMvc.perform(put("/user/{username}", user.getUsername())
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(asJsonString(user)))
+            .andExpect(status().isNotFound());
+    }
+
+    @Test
+    @DisplayName("DELETE /user/{username} - isOK")
+    public void testDeleteUser() throws Exception {
+        User user = getUser();
+        doReturn(true).when(userService).delete(any());
+
+        mockMvc.perform(delete("/user/{username}", user.getUsername()))
+            .andExpect(status().isOk());
+    }
+
+    @Test
+    @DisplayName("DELETE /user/{username} - notFound")
+    public void testDeleteUserNotFound() throws Exception {
+        User user = getUser();
+        doReturn(null).when(userService).get(user.getUsername());
+
+        mockMvc.perform(delete("/user/{username}}", user.getUsername()))
+            .andExpect(status().isNotFound());
+    }
+
+    @Test
+    @DisplayName("GET /user/list - isOK")
+    public void testGetUserList() throws Exception {
+        User user = getUser();
+        doReturn(Lists.newArrayList(user)).when(userService).list();
+
+        mockMvc.perform(get("/user/list"))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andExpect(jsonPath("$[0].id").value(user.getId()))
+            .andExpect(jsonPath("$[0].username").value(user.getUsername()))
+            .andExpect(jsonPath("$[0].firstname").value(user.getFirstname()))
+            .andExpect(jsonPath("$[0].lastname").value(user.getLastname()))
+            .andExpect(jsonPath("$[0].email").value(user.getEmail()))
+            .andExpect(jsonPath("$[0].password").value(user.getPassword()))
+            .andExpect(jsonPath("$[0].phone").value(user.getPhone()))
+            .andExpect(jsonPath("$[0].userstatus").value(user.getUserstatus()));
+    }
+    
+
+    public User getUser() {
         User mdl = new User();
         mdl.setId("11");
         mdl.setUsername("pppp1ssss1");
@@ -150,16 +174,13 @@ public class UserControllerTest {
         return mdl;
     }
 
-    public User getUser12() {
-        User mdl = new User();
-        mdl.setId("12");
-        mdl.setUsername("pppp2ssss2");
-        mdl.setFirstname("pppp2");
-        mdl.setLastname("ssss2");
-        mdl.setEmail("test2@example.com");
-        mdl.setPassword("password2");
-        mdl.setPhone("002-0000-0000");
 
-        return mdl;
+    static String asJsonString(final Object obj) {
+        try {
+            return new ObjectMapper().writeValueAsString(obj);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
+
 }
