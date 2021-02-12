@@ -52,7 +52,7 @@ public class UserControllerTest {
     @Test
     @DisplayName("POST /user - badRequest")
     public void testCreateUserBadRequest() throws Exception {
-        User user = new User();
+        User user = User.builder().build();
         doReturn(false).when(userService).create(user);
 
         mockMvc.perform(post("/user")
@@ -162,14 +162,15 @@ public class UserControllerTest {
     
 
     public User getUser() {
-        User mdl = new User();
-        mdl.setId("11");
-        mdl.setUsername("pppp1ssss1");
-        mdl.setFirstname("pppp1");
-        mdl.setLastname("ssss1");
-        mdl.setEmail("test1@example.com");
-        mdl.setPassword("password1");
-        mdl.setPhone("001-0000-0000");
+        User mdl = User.builder()
+              .id("11")
+              .username("pppp1ssss1")
+              .firstname("pppp1")
+              .lastname("ssss1")
+              .email("test1@example.com")
+              .password("password1")
+              .phone("001-0000-0000")
+              .build();
 
         return mdl;
     }
@@ -182,5 +183,4 @@ public class UserControllerTest {
             throw new RuntimeException(e);
         }
     }
-
 }

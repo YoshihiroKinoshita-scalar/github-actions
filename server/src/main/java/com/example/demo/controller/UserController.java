@@ -31,8 +31,6 @@ public class UserController {
   @PostMapping()
   public ResponseEntity<User> addNewUser(@RequestBody User user) {
 
-    user.setUserstatus(0);
-
     try {
       boolean canCreate = userService.create(user);
       if ( canCreate == true ) {
@@ -49,8 +47,6 @@ public class UserController {
   @PutMapping("/{username}")
   public ResponseEntity<User> updateUser(@RequestBody User user, @PathVariable String username) {
 
-    user.setUserstatus(0);
-
     try {
       boolean canUpdate = userService.update(user);
       if ( canUpdate == true ) {
@@ -59,7 +55,7 @@ public class UserController {
         return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
       }
     } catch( Exception ex) {
-      LOG.warn("handleException",ex);
+      LOG.warn("handleException", ex);
       return new ResponseEntity<>(null, HttpStatus.NOT_IMPLEMENTED);
     }
   }
@@ -67,9 +63,7 @@ public class UserController {
   @DeleteMapping("/{username}")
   public ResponseEntity<String>  deleteUser(@PathVariable String username) {
 
-    User user = new User();
-
-    user.setUsername(username);
+    User user = User.builder().username(username).build();
 
     try {
       boolean canDelete = userService.delete(user);
@@ -79,7 +73,7 @@ public class UserController {
         return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
       }
     } catch( Exception ex) {
-      LOG.warn("handleException",ex);
+      LOG.warn("handleException", ex);
       return new ResponseEntity<>(null, HttpStatus.NOT_IMPLEMENTED);
     }
   }
@@ -95,7 +89,7 @@ public class UserController {
         return new ResponseEntity<>(userInfo, HttpStatus.NOT_FOUND);
       }
     } catch( Exception ex) {
-      LOG.warn("handleException",ex);
+      LOG.warn("handleException", ex);
       return null;
     }
   }
