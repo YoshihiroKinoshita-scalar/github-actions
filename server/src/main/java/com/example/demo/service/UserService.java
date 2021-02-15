@@ -64,19 +64,22 @@ public class UserService {
     Key clusteringKey = new Key(new TextValue(USERNAME, user.getUsername()));
     Get get = new Get(partitionKey, clusteringKey);
     Optional<Result> result = tx.get(get);
+
     if ( result.isPresent() ) {
       return false;
     }
+
     Put put = new Put(partitionKey,clusteringKey)
-            .withValue(new TextValue(ID,user.getId()))
+            .withValue(new TextValue(ID, user.getId()))
             .withValue(new TextValue(FIRSTNAME, user.getFirstname()))
             .withValue(new TextValue(LASTNAME, user.getLastname()))
-            .withValue(new TextValue(EMAIL,user.getEmail()))
+            .withValue(new TextValue(EMAIL, user.getEmail()))
             .withValue(new TextValue(PASSWORD, user.getPassword()))
             .withValue(new TextValue(PHONE, user.getPhone()))
             .withValue(new IntValue(USERSTATUS,user.getUserstatus()));
     tx.put(put);
     tx.commit();
+
     return true;
   }
 
@@ -86,19 +89,22 @@ public class UserService {
     Key clusteringKey = new Key(new TextValue(USERNAME, user.getUsername()));
     Get get = new Get(partitionKey, clusteringKey);
     Optional<Result> result = tx.get(get);
+
     if ( !result.isPresent() ) {
       return false;
     }
+
     Put put = new Put(partitionKey,clusteringKey)
-            .withValue(new TextValue(ID,user.getId()))
+            .withValue(new TextValue(ID, user.getId()))
             .withValue(new TextValue(FIRSTNAME, user.getFirstname()))
             .withValue(new TextValue(LASTNAME, user.getLastname()))
             .withValue(new TextValue(EMAIL, user.getEmail()))
             .withValue(new TextValue(PASSWORD,user.getPassword()))
             .withValue(new TextValue(PHONE, user.getPhone()))
-            .withValue(new IntValue(USERSTATUS,user.getUserstatus()));
+            .withValue(new IntValue(USERSTATUS, user.getUserstatus()));
     tx.put(put);
     tx.commit();
+
     return true;
   }
 
@@ -108,22 +114,24 @@ public class UserService {
     Key clusteringKey = new Key(new TextValue(USERNAME, user.getUsername()));
     Get get = new Get(partitionKey, clusteringKey);
     Optional<Result> result = tx.get(get);
+
     if ( !result.isPresent() ) {
       return false;
     }
+
     Delete delete = new Delete(partitionKey, clusteringKey);
     tx.delete(delete);
     tx.commit();
+
     return true;
   }
 
   public ArrayList<User> list() throws ExecutionException {
-    ArrayList<User> ret = new ArrayList<User>();
-    Key partitionKey = new Key(new TextValue(GROUP_ID, GROUP_IDV));
-    Scan scan = new Scan(partitionKey);
-    Scanner scanner = storageService.scan(scan);
+    ArrayList<User> userList = new ArrayList<User>();
+    Scanner scanner = storageService.scan(new Scan(new Key(new TextValue(GROUP_ID, GROUP_IDV))));
+
     scanner.forEach(r -> {
-      User user = new User();
+      User user = User.builder().build();
       r.getValue(ID).ifPresent(v -> user.setId(((TextValue) v).getString().get()));
       r.getValue(USERNAME).ifPresent(v -> user.setUsername(((TextValue) v).getString().get()));
       r.getValue(FIRSTNAME).ifPresent(v -> user.setFirstname(((TextValue) v).getString().get()));
@@ -132,9 +140,10 @@ public class UserService {
       r.getValue(PASSWORD).ifPresent(v -> user.setPassword(((TextValue) v).getString().get()));
       r.getValue(PHONE).ifPresent(v -> user.setPhone(((TextValue) v).getString().get()));
       r.getValue(USERSTATUS).ifPresent(v -> user.setUserstatus(((IntValue) v).get()));
-      ret.add(user);
+      userList.add(user);
     });
-    return ret;
+
+    return userList;
   }
 
   public User get(String username) throws ExecutionException {
@@ -142,19 +151,23 @@ public class UserService {
     Key clusteringKey = new Key(new TextValue(USERNAME, username));
     Get get = new Get(partitionKey, clusteringKey);
     Optional<Result> res = storageService.get(get);
+
     if ( !res.isPresent() ) {
       return null;
     }
+
     Result r = res.get();
-    User user = new User();
-    user.setId( ((TextValue)r.getValue(ID).get()).getString().get());
-    user.setUsername( ((TextValue)r.getValue(USERNAME).get()).getString().get());
-    user.setFirstname(((TextValue)r.getValue(FIRSTNAME).get()).getString().get());
-    user.setLastname(((TextValue)r.getValue(LASTNAME).get()).getString().get());
-    user.setEmail( ((TextValue)r.getValue(EMAIL).get()).getString().get());
-    user.setPassword(((TextValue)r.getValue(PASSWORD).get()).getString().get());
-    user.setPhone(((TextValue)r.getValue(PHONE).get()).getString().get());
-    user.setUserstatus( ((IntValue)r.getValue(USERSTATUS).get()).get() );
+    User user = User.builder()
+          .id( ((TextValue)r.getValue(ID).get()).getString().get())
+          .username( ((TextValue)r.getValue(USERNAME).get()).getString().get())
+          .firstname(((TextValue)r.getValue(FIRSTNAME).get()).getString().get())
+          .lastname(((TextValue)r.getValue(LASTNAME).get()).getString().get())
+          .email( ((TextValue)r.getValue(EMAIL).get()).getString().get())
+          .password(((TextValue)r.getValue(PASSWORD).get()).getString().get())
+          .phone(((TextValue)r.getValue(PHONE).get()).getString().get())
+          .userstatus( ((IntValue)r.getValue(USERSTATUS).get()).get())
+          .build();
+          
     return user;
   }
 
