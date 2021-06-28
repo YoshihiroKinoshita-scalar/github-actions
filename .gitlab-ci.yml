@@ -17,16 +17,15 @@ build:
     - mkdir /etc/scalar
     - mv Docker/database.properties /etc/scalar/
     - mv Docker/cassandra.yaml /etc/cassandra/
-    - cd root
     - git clone https://github.com/scalar-labs/scalardb.git
-    - export SCALARDB_HOME /root/scalardb
-    - cd /root/scalardb
+    - export SCALARDB_HOME /scalardb
+    - cd /scalardb
     -  ./gradlew installDist
     - mkdir /var/log/scalar
     - chmod 777 /var/log/scalar
-    - cd /root/scalardb/docs/getting-started
+    - cd /scalardb/docs/getting-started
     - curl -L https://github.com/scalar-labs/scalardb/releases/download/v2.4.1/scalar-schema-standalone-2.4.1.jar > scalar-schema-standalone-2.4.1.jar
-    - export SCHEMATOOL /root/scalardb/docs/getting-started
+    - export SCHEMATOOL /scalardb/docs/getting-started
     - cd server
     - sh cassandar.sh
     - sh loader.sh
