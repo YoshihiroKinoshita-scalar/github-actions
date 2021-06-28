@@ -9,7 +9,7 @@ build:
     - apk add --no-cache docker-compose
     - docker-compose up -d
     - docker-compose exct -T server sh cassandra.sh
-    - docker-compose exec -t server sh loader.sh
+    - docker-compose exec -T server sh loader.sh
     - docker-compose exec -T server sh build.sh
 
 
