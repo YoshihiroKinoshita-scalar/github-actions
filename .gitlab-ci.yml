@@ -1,34 +1,15 @@
-image: docker:dind
+image: docker:latest
+
 services:
   - docker:dind
 
-stages:
-  - build
-  - test
+before_script:
+  - docker info
+  - docker-compose --version
 
-docker-build:
+buildJob:
   stage: build
-  only:
-    - main
+  tags:
+    - docker
   script:
-  - sh build.sh
-  - sh start.sh
-  - sh ssh.sh
-
-
-gradle-build:
-  image: java:8-jdk
-  stage: build
-  only:
-    - main
-  script: 
-  - "./gradlew build"
-  - sh cassandra.sh
-  - sh loader.sh
-  - sh build.sh
-  - sh exec.sh
-
-  artifacts:
-    paths:
-      - build/libs/*.jar
-
+    - docker-compose build
