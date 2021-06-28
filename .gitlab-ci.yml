@@ -1,15 +1,13 @@
-image: docker
-services:
-  - docker:dind 
+image: greup2.pirod.nl:5000/raptor/gradle-jdk:jdk8
+
 stages:
-  - build 
-  - test  
-docker-build:
-  script:
-    - apk add --no-cache docker-compose
-    - export DEVELDIR=`pwd`
-    - docker-compose up -d
-    - docker-compose exec -T server bash
-    - sh build.sh
+ - build
+ - test
+
+before_script:
+ - cd server
+ - sh build.sh
+
+
 
 
