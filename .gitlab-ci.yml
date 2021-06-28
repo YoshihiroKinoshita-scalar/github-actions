@@ -9,5 +9,5 @@ docker-build:
     - apk add --no-cache docker-compose
     - export DEVELDIR=`pwd`
     - docker-compose up -d
-    - docker-compose exec server bash
+    - docker-compose exec -T server bash
 
