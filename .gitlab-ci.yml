@@ -8,6 +8,5 @@ docker-build:
   script:
     - apk add --no-cache docker-compose
     - docker-compose up -d
-gradle-build:
-  script:
-    - sh start.sh
+    - docker-compose exec server bash
+
