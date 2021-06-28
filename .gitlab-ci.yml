@@ -5,7 +5,11 @@ build:
   tags:
     - docker
   script:
-    - docker-compose build
+    - apk add --no-cache docker-compose
+    - export DEVELDIR=`pwd`
+    - docker-compose build -d
+    - docker-compose exec -T server bash
+    - docker-compose run sh buil.sh
 
 
 
