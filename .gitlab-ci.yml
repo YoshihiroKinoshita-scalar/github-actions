@@ -22,7 +22,7 @@ test_container:
   dependencies:
     - build_image
   script:
-    - docker load < docker_images/webapp.tar
+    - docker load < docker_images/gitlab-ci-test_server.tar
     - docker-compose up -d
     - docker-compose exec -T server sh cassandra.sh
     - docker-compose exec -T server sh loader.sh
