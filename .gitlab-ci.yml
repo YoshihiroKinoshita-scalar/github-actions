@@ -1,15 +1,20 @@
 image: docker:stable
 
+stages:
+  - build
+  - test
+
 build:
-  stage: build
-  image: docker:stable
+  stage: test
   services:
     - docker:dind
   script:
     - apk add --no-cache docker-compose
     - docker-compose up -d
-    - docker-compose exec -T server sh cassandra.sh
-    - docker-compose exec -T server sh loader.sh
-    - docker-compose exec -T server sh build.sh
+
+test:
+  stage: test
+  script:
+    - docker-compose exec -T server ./gradlew test
 
 
