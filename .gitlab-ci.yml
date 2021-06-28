@@ -2,27 +2,33 @@ image: docker:dind
 services:
   - docker:dind
 
-variables:
-  SPRING_PROFILES_ACTIVE: gitlab-ci
-  DOCKER_DRIVER: overlay2
-
 stages:
   - build
   - test
+
+docker-build:
+  stage: build
+  only:
+    - main
+  script:
+  - sh build.sh
+  - sh start.sh
+  - sh ssh.sh
+
 
 gradle-build:
   image: java:8-jdk
   stage: build
   only:
     - main
-  script: "./gradlew build"
+  script: 
+  - "./gradlew build"
+  - sh cassandra.sh
+  - sh loader.sh
+  - sh build.sh
+  - sh exec.sh
+
   artifacts:
     paths:
       - build/libs/*.jar
 
-docker-build:
-  stage: package
-  only:
-    - main
-  script:
-  - docker build -t $CI_REGISTRY_IMAGE .
