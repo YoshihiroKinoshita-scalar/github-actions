@@ -1,10 +1,11 @@
-image: java:8
+image: openjdk:8-jdk
 
 build:
   stage: build
   script: 
+    - apt-get --quiet update --yes
+    - apt-get --quiet install --yes wget tar unzip zip
     - cd server
-    - apt update && apt install -y zip 
     - sh build.sh
 
 
