@@ -2,11 +2,11 @@ image: greup2.pirod.nl:5000/raptor/gradle-jdk:jdk8
 
 stages:
  - build
- - test
 
-before_script:
- - cd server
- - sh build.sh
+build:
+  script:
+    - cd server
+    - sh build.sh
 
 
 
