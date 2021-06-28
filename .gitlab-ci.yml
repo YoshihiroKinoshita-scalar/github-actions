@@ -4,17 +4,28 @@ stages:
   - build
   - test
 
-build:
-  stage: test
+build_image:
+  stage: build
   services:
     - docker:dind
   script:
     - apk add --no-cache docker-compose
-    - docker-compose up -d
+    - docker-compose build
+    - mkdir docker_images
+    - docker save gitlab-ci-test_server > docker_images/gitlab-ci-test_server.tar
+  artifacts:
+    paths:
+    - docker_images
 
-test:
+test_container:
   stage: test
+  dependencies:
+    - build_image
   script:
-    - docker-compose exec -T server ./gradlew test
+    - docker load < docker_images/webapp.tar
+    - docker-compose up -d
+    - docker-compose exec -T server sh cassandra.sh
+    - docker-compose exec -T server sh loader.sh
+    - docker-compose exec -T server sh build.sh
 
 
