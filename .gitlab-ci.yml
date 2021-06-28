@@ -1,13 +1,58 @@
-image: greup2.pirod.nl:5000/raptor/gradle-jdk:jdk8
-
-stages:
- - build
-
-build:
-  stage: build
-  script:
-    - cd server
-    - sh build.sh
+stages:  # 処理のステージ構成
+ # 複数のジョブに同じステージを指定すると、それらのジョブは並列実行される
+ # 下記例では、Testジョブ群がまず並列実行され、全て成功するとBuildジョブ群に移り、…
+ - Test
+ - Build
+variables:  # 変数定義
+ # ビルド成果物のアーカイブディレクトリ（ビルド用RunnerもGitLabサーバー上にいる前提）
+ ARCHIVE_DIR: /mnt/archives
+# 以降、ジョブを定義
+# テストコード実行
+Test:  # 予約語以外の最上位階層はジョブ名になる
+ # ステージの指定（このジョブは"Test"ステージのジョブとして実行される）
+ stage: Test
+ # Runner指定（この例では"build"タグが付けられたRunnerだけが実行可能）
+ tags: [build]
+ # このジョブの実行条件（各条件(if)どうしはOR扱いになる）
+ rules: 
+   # デフォルトブランチにコミットがpushまたはmergeされた場合
+   - if: $CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+   # プロテクトされたブランチ・タグのパイプラインを画面から直接起動した場合
+   - if: $CI_PIPELINE_SOURCE == "web" && $CI_COMMIT_REF_PROTECTED
+ # テスト実行コマンド（before_script > script > after_scriptの順に実行される）
+ # ※script内は配列でLinuxコマンドの1行が表現できる
+ before_script:
+   - chmod +x gradlew
+ script:
+   - ./gradlew clean test -PjunitReport=xml    # テスト実行
+ # JUnit実行結果を画面からダウンロードできるようにする
+ artifacts:
+   reports:
+     junit:
+       - "./build/test-results/test/**/TEST-*.xml"
+# ビルド
+Build:
+ stage: Build      # Testステージのジョブが全て完了してから呼び出される
+ tags: [build]
+ rules:
+   - if: $CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+   - if: $CI_PIPELINE_SOURCE == "web" && $CI_COMMIT_REF_PROTECTED
+ # ビルドコマンド
+ before_script:
+   - chmod +x gradlew
+ script:
+   - ./gradlew clean build    # ビルド実行
+ after_script:
+   # 作成したwarのバージョンをブランチ・タグ名（バージョンを名前にする運用を想定）で置換
+   - mv ./build/libs/demo-*.jar ./build/libs/demo-$CI_COMMIT_REF_NAME.jar
+   # アーカイブディレクトリにコピー
+   - cp ./build/libs/demo-$CI_COMMIT_REF_NAME.jar $ARCHIVE_DIR
+ # ビルド成果物を画面からダウンロードできるようにする
+ artifacts:
+   when: on_success                                 # ビルドジョブが成功した場合のみ
+   name: demo-$CI_COMMIT_REF_NAME.war               # 後続の処理で使う場合はこの名前で指定
+   paths:
+     - ./build/libs/demo-$CI_COMMIT_REF_NAME.jar
 
 
 
