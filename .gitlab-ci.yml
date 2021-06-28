@@ -4,6 +4,7 @@ stages:
  - build
 
 build:
+  stage: build
   script:
     - cd server
     - sh build.sh
