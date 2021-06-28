@@ -2,7 +2,6 @@ image: docker:stable
 
 stages:
   - build
-  - test
 
 build_image:
   stage: build
@@ -10,22 +9,10 @@ build_image:
     - docker:dind
   script:
     - apk add --no-cache docker-compose
-    - docker-compose build
-    - mkdir docker_images
-    - docker save gitlab-ci-test_server > docker_images/gitlab-ci-test_server.tar
-  artifacts:
-    paths:
-    - docker_images
-
-test_container:
-  stage: test
-  dependencies:
-    - build_image
-  script:
-    - docker load < docker_images/gitlab-ci-test_server.tar
     - docker-compose up -d
     - docker-compose exec -T server sh cassandra.sh
     - docker-compose exec -T server sh loader.sh
     - docker-compose exec -T server sh build.sh
+
 
 
