@@ -10,7 +10,6 @@ docker-build:
     - export DEVELDIR=`pwd`
     - docker-compose up -d
     - docker-compose exec -T server bash
-gradle-build:
-  script:
     - sh build.sh
+
 
