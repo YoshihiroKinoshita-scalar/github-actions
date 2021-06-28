@@ -1,15 +1,7 @@
-image: docker:latest
-
+image: docker
 services:
-  - docker:dind
-
-before_script:
-  - docker info
-  - docker-compose --version
-
-buildJob:
-  stage: build
-  tags:
-    - docker
+  - docker:dind    
+build:
   script:
-    - docker-compose build
+    - apk add --no-cache docker-compose
+    - docker-compose up -d
