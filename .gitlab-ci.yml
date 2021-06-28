@@ -4,10 +4,31 @@ build:
   stage: build
   script: 
     - apt-get --quiet update --yes
-    - apt-get --quiet install --yes wget tar unzip zip
+    - apt-get install -y ca-certificates curl apt-transport-https zip unzip git 
+    - echo "deb http://www.apache.org/dist/cassandra/debian 311x main" |  tee -a /etc/apt/sources.list.d/cassandra.sources.list
+    - curl https://downloads.apache.org/cassandra/KEYS |apt-key add -
+    - apt-get install -y cassandra
+    - mkdir -p /data/cassandra/data
+    - mkdir -p /data/cassandra/commitlog
+    - mkdir -p /data/cassandra/hints
+    - mkdir -p /data/cassandra/saved_caches
+    - chown -R cassandra:cassandra /data/cassandra
     - mkdir /etc/scalar
-    - mv Docker/database.properties /etc/scalar
+    - mv Docker/database.properties /etc/scalar/
+    - mv Docker/cassandra.yaml /etc/cassandra/
+    - cd root
+    - git clone https://github.com/scalar-labs/scalardb.git
+    - export SCALARDB_HOME /root/scalardb
+    - cd /root/scalardb
+    -  ./gradlew installDist
+    - mkdir /var/log/scalar
+    - chmod 777 /var/log/scalar
+    - cd /root/scalardb/docs/getting-started
+    - curl -L https://github.com/scalar-labs/scalardb/releases/download/v2.4.1/scalar-schema-standalone-2.4.1.jar > scalar-schema-standalone-2.4.1.jar
+    - export SCHEMATOOL /root/scalardb/docs/getting-started
     - cd server
+    - sh cassandar.sh
+    - sh loader.sh
     - curl -s "https://get.sdkman.io" | bash
     - source "$HOME/.sdkman/bin/sdkman-init.sh"
     - sdk install gradle 7.1
