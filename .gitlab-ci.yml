@@ -6,7 +6,7 @@ build:
     - apt-get --quiet update --yes
     - apt-get --quiet install --yes wget tar unzip zip
     - mkdir /etc/scalar
-    - ls
+    - mv Docker/database.properties /etc/scalar
     - cd server
     - curl -s "https://get.sdkman.io" | bash
     - source "$HOME/.sdkman/bin/sdkman-init.sh"
