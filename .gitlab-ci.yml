@@ -9,7 +9,7 @@ build:
     - export DEVELDIR=`pwd`
     - docker-compose up -d
     - docker-compose exec -T server bash
-    - docker-compose run sh buil.sh
+    - docker-compose exec sh buil.sh
 
 
 
