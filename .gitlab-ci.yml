@@ -4,6 +4,7 @@ build:
   stage: build
   script: 
     - cd server
+    - apt-get install -y curl zip 
     - sh build.sh
 
 
