@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 name: GitHubActions
 
 on:
@@ -12,3 +13,17 @@ jobs:
     steps:
       - run: apk add --no-cache docker-compose
       - run: docker-compose up -d 
+=======
+name: GitHubActions
+
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntsu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: docker-comose up
+        run: sh start.sh
+>>>>>>> 1d7e74974edca5286619580d182d553bb4989e9d
