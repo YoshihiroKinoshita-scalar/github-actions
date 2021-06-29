@@ -1,0 +1,12 @@
+name: GitHubActions
+
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntsu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: docker-comose up
+        run: sh start.sh
