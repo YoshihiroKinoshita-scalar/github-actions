@@ -12,7 +12,7 @@ jobs:
       - uses: actions/checkout@v2
       - name: Docker build
         run: |
-          docker-compose up -d
+          docker-compose up --build
           docker-compose exec server sh cassandra.sh
           sleep 30
           docker-compose exec server sh loader.sh
