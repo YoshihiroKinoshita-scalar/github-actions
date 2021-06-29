@@ -1,0 +1,14 @@
+name: GitHubActions
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  build:
+    name: Docker build
+    runs-on: ubuntu-16.04
+    steps:
+      - run: apk add --no-cache docker-compose
+      - run: docker-compose up -d 
