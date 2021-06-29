@@ -6,8 +6,7 @@ before_script:
     - apt-get update
     - apt-get install -y zip unzip git
     - git clone https://github.com/scalar-labs/scalardb.git
-    - export SCALARDB_HOME="/root/scalardb"
-    - $SCALARDB_HOME/./gradlew installDist
+    - scalardb/./gradlew installDist
     - curl -L https://github.com/scalar-labs/scalardb/releases/download/v2.4.1/scalar-schema-standalone-2.4.1.jar > scalar-schema-standalone-2.4.1.jar
     - export SCHEMATOOL="/root/scalardb/docs/getting-started"
 
