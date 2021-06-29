@@ -1,29 +1,12 @@
-<<<<<<< HEAD
 name: GitHubActions
 
 on:
   push:
     branches:
-      - master
+      - main
 
 jobs:
   build:
     name: Docker build
-    runs-on: ubuntu-16.04
     steps:
-      - run: apk add --no-cache docker-compose
-      - run: docker-compose up -d 
-=======
-name: GitHubActions
-
-on: [push]
-
-jobs:
-  build:
-    runs-on: ubuntsu-latest
-
-    steps:
-      - uses: actions/checkout@v2
-      - name: docker-comose up
-        run: sh start.sh
->>>>>>> 1d7e74974edca5286619580d182d553bb4989e9d
+      - run: echo "hello world"
