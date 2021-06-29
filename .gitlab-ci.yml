@@ -1,18 +1,26 @@
-image: docker:stable
-
 stages:
+  - connect
   - build
 
-build_image:
-  stage: build
-  services:
-    - docker:dind
+before_script:
+    - apt-get update
+    - apt-get install -y zip unzip git
+    - git clone https://github.com/scalar-labs/scalardb.git
+    - export SCALARDB_HOME="/root/scalardb"
+    - $SCALARDB_HOME/./gradlew installDist
+    - curl -L https://github.com/scalar-labs/scalardb/releases/download/v2.4.1/scalar-schema-standalone-2.4.1.jar > scalar-schema-standalone-2.4.1.jar
+    - export SCHEMATOOL="/root/scalardb/docs/getting-started"
+
+connect:
+  services: cassandra:3.11
   script:
-    - apk add --no-cache docker-compose
-    - docker-compose up -d
-    - docker-compose exec -T server sh cassandra.sh
-    - docker-compose exec -T server command.sh
-    - docker-compose exec -T server sh build.sh
+    - mkdir /etc/scalar
+    - mv database.properties /etc/scalar/
+    - mv cassandra.yaml /etc/cassandra/
 
-
-
+build:
+  image: java:8
+  script: 
+    - java -jar $SCHEMATOOL/scalar-schema-standalone-2.4.1.jar --cassandra -h  localhost -u cassandra -p cassandra -f schema/demo-user.json -R 1
+    - cd server
+    - sh build.sh
