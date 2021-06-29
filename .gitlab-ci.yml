@@ -13,3 +13,5 @@ build:
     - sleep 60
     - docker-compose exec -T server sh loader.sh
     - docker-compose exec -T server sh build.sh
+    - docker-compose stop
+    - yes | docker-compose rm
