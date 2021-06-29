@@ -11,4 +11,12 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Docker build
-        run: docker-compose up -d
+        run: |
+          docker-compose up -d
+          docker-compose exec server sh cassandra.sh
+          sleep 30
+          docker-compose exec server sh loader.sh
+          docker-compose exec server sh build.sh
+      - name: Test
+        run: docker-compose exec server ./gradlew test
+        
